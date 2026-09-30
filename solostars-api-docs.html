@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SoloStars API hujjatlari</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbfaf7;--card:#fff;--ink:#1b1f3a;--mute:#5d627c;--line:#e4e2da;--acc:#e8a200;--accd:#7a5200;--code:#14172b;--codet:#e6e8f5;--ok:#1d7a4b;--err:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111426;--card:#181c33;--ink:#eceefb;--mute:#9aa0c3;--line:#2a2f52;--acc:#ffc233;--accd:#ffd77a;--code:#0a0c1a;--ok:#5ad39a;--err:#ff8a80}}
+:root[data-theme="dark"]{--bg:#111426;--card:#181c33;--ink:#eceefb;--mute:#9aa0c3;--line:#2a2f52;--acc:#ffc233;--accd:#ffd77a;--code:#0a0c1a;--ok:#5ad39a;--err:#ff8a80}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Onest,system-ui,sans-serif}
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);max-width:1080px;margin:0 auto;gap:40px;padding:0 20px}
+nav{position:sticky;top:0;align-self:start;padding:28px 0;max-height:100vh;overflow:auto}
+nav b{display:block;font-size:20px;margin-bottom:4px}
+nav small{color:var(--mute);display:block;margin-bottom:18px}
+nav a{display:block;color:var(--mute);text-decoration:none;padding:5px 0 5px 12px;border-left:2px solid var(--line);font-size:14.5px}
+nav a:hover,nav a:focus-visible{color:var(--ink);border-left-color:var(--acc);outline:none}
+main{padding:36px 0 80px;min-width:0}
+h1{font-size:clamp(32px,5vw,48px);line-height:1.1;margin:0 0 12px;letter-spacing:-.02em}
+h2{font-size:26px;margin:52px 0 12px;letter-spacing:-.01em}
+h3{font-size:17px;margin:28px 0 8px}
+p{max-width:68ch}
+.lead{font-size:18px;color:var(--mute)}
+.star{color:var(--acc)}
+code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.88em;background:color-mix(in srgb,var(--acc) 16%,transparent);padding:1px 6px;border-radius:5px}
+pre{background:var(--code);color:var(--codet);padding:16px 18px;border-radius:10px;overflow-x:auto;font:13.5px/1.6 'JetBrains Mono',ui-monospace,monospace;margin:10px 0}
+pre code{background:none;padding:0;font-size:inherit}
+.ep{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:14px 0 6px;font-family:'JetBrains Mono',monospace;font-size:14px}
+.m{font-weight:500;padding:2px 9px;border-radius:6px;color:#fff;font-size:12.5px}
+.get{background:#2367c9}.post{background:var(--ok)}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500}
+.tabs{display:flex;gap:6px;margin-top:14px}
+.tabs button{font:inherit;font-size:13.5px;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:5px 14px;border-radius:8px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#1b1f3a;font-weight:500}
+.tabs button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.pane[hidden]{display:none}
+.note{border-left:3px solid var(--acc);background:color-mix(in srgb,var(--acc) 10%,transparent);padding:10px 16px;border-radius:0 8px 8px 0;max-width:68ch}
+.s200{color:var(--ok)}.s4{color:var(--err)}
+@media (max-width:820px){.wrap{grid-template-columns:1fr;gap:0}nav{position:static;padding:20px 0 0;max-height:none}nav a{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:3px 12px;margin:0 6px 6px 0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="Bo‘limlar">
+<b><span class="star">★</span> SoloStars API</b>
+<small>v1 · @solostarsuz_bot</small>
+<a href="#boshlash">Boshlash</a>
+<a href="#auth">Avtorizatsiya</a>
+<a href="#balans">Balans</a>
+<a href="#stars">Stars</a>
+<a href="#premium">Premium</a>
+<a href="#buyurtma">Buyurtma holati</a>
+<a href="#webhook">Webhook</a>
+<a href="#xatolar">Xatolar</a>
+<a href="#limit">Limitlar</a>
+</nav>
+<main>
+<h1>SoloStars API</h1>
+<p class="lead">Telegram Stars va Telegram Premium buyurtmalarini o‘z saytingiz yoki botingizdan to‘g‘ridan-to‘g‘ri yuboring. Barcha so‘rovlar JSON formatida ishlaydi.</p>
+
+<div class="note"><b>Eslatma:</b> quyidagi manzil va maydonlar namuna. Bot backend’ingizdagi haqiqiy endpoint’larga moslab, <code>BASE_URL</code> ni almashtiring.</div>
+
+<h2 id="boshlash">Boshlash</h2>
+<p>Asosiy manzil:</p>
+<pre><code>https://api.solostars.uz/v1</code></pre>
+<p>API kalitni olish uchun <b>@solostarsuz_bot</b> ga kiring, <code>/api</code> buyrug‘ini yuboring. Bot sizga kalit beradi. Kalitni hech kimga bermang.</p>
+<p>Tezkor sinov:</p>
+<pre><code>curl https://api.solostars.uz/v1/balance \
+  -H "Authorization: Bearer YOUR_API_KEY"</code></pre>
+
+<h2 id="auth">Avtorizatsiya</h2>
+<p>Har bir so‘rovda <code>Authorization</code> sarlavhasi bo‘lishi shart:</p>
+<pre><code>Authorization: Bearer YOUR_API_KEY
+Content-Type: application/json</code></pre>
+<p>Kalit noto‘g‘ri bo‘lsa, <code>401 invalid_api_key</code> qaytadi.</p>
+
+<h2 id="balans">Balans</h2>
+<div class="ep"><span class="m get">GET</span>/balance</div>
+<p>Hisobingizdagi mablag‘ni ko‘rsatadi.</p>
+<pre><code>{
+  "ok": true,
+  "balance": 1250000,
+  "currency": "UZS"
+}</code></pre>
+
+<h2 id="stars">Telegram Stars</h2>
+
+<h3>Narxlar ro‘yxati</h3>
+<div class="ep"><span class="m get">GET</span>/stars/prices</div>
+<pre><code>{
+  "ok": true,
+  "min": 50,
+  "max": 100000,
+  "price_per_star": 215,
+  "currency": "UZS"
+}</code></pre>
+
+<h3>Stars buyurtma berish</h3>
+<div class="ep"><span class="m post">POST</span>/stars/order</div>
+<div class="tw"><table>
+<tr><th>Maydon</th><th>Turi</th><th>Tavsif</th></tr>
+<tr><td><code>username</code></td><td>string</td><td>Oluvchining Telegram username’i, <code>@</code> belgisisiz</td></tr>
+<tr><td><code>amount</code></td><td>integer</td><td>Stars miqdori (kamida 50)</td></tr>
+<tr><td><code>order_id</code></td><td>string</td><td>Ixtiyoriy. O‘zingizning buyurtma raqamingiz (takroriy so‘rovdan himoya qiladi)</td></tr>
+</table></div>
+
+<div class="tabs" role="tablist" aria-label="Kod namunasi">
+<button role="tab" aria-selected="true" data-t="c1">cURL</button>
+<button role="tab" aria-selected="false" data-t="c2">Python</button>
+<button role="tab" aria-selected="false" data-t="c3">JavaScript</button>
+</div>
+<div class="pane" id="c1"><pre><code>curl -X POST https://api.solostars.uz/v1/stars/order \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"durov","amount":100,"order_id":"A-1001"}'</code></pre></div>
+<div class="pane" id="c2" hidden><pre><code>import requests
+
+r = requests.post(
+    "https://api.solostars.uz/v1/stars/order",
+    headers={"Authorization": "Bearer YOUR_API_KEY"},
+    json={"username": "durov", "amount": 100, "order_id": "A-1001"},
+    timeout=30,
+)
+print(r.json())</code></pre></div>
+<div class="pane" id="c3" hidden><pre><code>const res = await fetch("https://api.solostars.uz/v1/stars/order", {
+  method: "POST",
+  headers: {
+    "Authorization": "Bearer YOUR_API_KEY",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ username: "durov", amount: 100, order_id: "A-1001" })
+});
+console.log(await res.json());</code></pre></div>
+
+<p>Javob <span class="s200">200</span>:</p>
+<pre><code>{
+  "ok": true,
+  "order": {
+    "id": "ord_8f3k2a",
+    "type": "stars",
+    "username": "durov",
+    "amount": 100,
+    "price": 21500,
+    "status": "pending"
+  }
+}</code></pre>
+
+<h2 id="premium">Telegram Premium</h2>
+
+<h3>Tariflar</h3>
+<div class="ep"><span class="m get">GET</span>/premium/plans</div>
+<pre><code>{
+  "ok": true,
+  "plans": [
+    { "months": 3,  "price": 175000 },
+    { "months": 6,  "price": 235000 },
+    { "months": 12, "price": 410000 }
+  ],
+  "currency": "UZS"
+}</code></pre>
+
+<h3>Premium buyurtma berish</h3>
+<div class="ep"><span class="m post">POST</span>/premium/order</div>
+<div class="tw"><table>
+<tr><th>Maydon</th><th>Turi</th><th>Tavsif</th></tr>
+<tr><td><code>username</code></td><td>string</td><td>Oluvchining username’i, <code>@</code> belgisisiz</td></tr>
+<tr><td><code>months</code></td><td>integer</td><td><code>3</code>, <code>6</code> yoki <code>12</code></td></tr>
+<tr><td><code>order_id</code></td><td>string</td><td>Ixtiyoriy. O‘zingizning buyurtma raqamingiz</td></tr>
+</table></div>
+<pre><code>curl -X POST https://api.solostars.uz/v1/premium/order \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"durov","months":3}'</code></pre>
+<pre><code>{
+  "ok": true,
+  "order": {
+    "id": "ord_p91x7c",
+    "type": "premium",
+    "username": "durov",
+    "months": 3,
+    "price": 175000,
+    "status": "pending"
+  }
+}</code></pre>
+<p>Akkauntda Premium allaqachon faol bo‘lsa, <code>409 premium_already_active</code> qaytadi.</p>
+
+<h2 id="buyurtma">Buyurtma holati</h2>
+<div class="ep"><span class="m get">GET</span>/orders/{id}</div>
+<pre><code>{
+  "ok": true,
+  "order": {
+    "id": "ord_8f3k2a",
+    "status": "completed",
+    "created_at": "2026-09-30T10:15:00Z",
+    "completed_at": "2026-09-30T10:15:40Z"
+  }
+}</code></pre>
+<div class="tw"><table>
+<tr><th>Status</th><th>Ma’nosi</th></tr>
+<tr><td><code>pending</code></td><td>Buyurtma qabul qilindi, bajarilmoqda</td></tr>
+<tr><td><code>completed</code></td><td>Stars yoki Premium yuborildi</td></tr>
+<tr><td><code>failed</code></td><td>Bajarilmadi, pul balansga qaytariladi</td></tr>
+<tr><td><code>refunded</code></td><td>Mablag‘ qaytarildi</td></tr>
+</table></div>
+
+<h2 id="webhook">Webhook</h2>
+<p>Buyurtma holati o‘zgarganda tizim sizning URL’ingizga <code>POST</code> so‘rov yuboradi. URL’ni botdagi <code>/api</code> bo‘limida kiriting.</p>
+<pre><code>{
+  "event": "order.completed",
+  "order": {
+    "id": "ord_8f3k2a",
+    "type": "stars",
+    "username": "durov",
+    "amount": 100,
+    "status": "completed"
+  }
+}</code></pre>
+<p>Voqealar: <code>order.completed</code>, <code>order.failed</code>, <code>order.refunded</code>. Serveringiz <code>200</code> qaytarishi kerak, aks holda so‘rov 3 marta qayta yuboriladi.</p>
+<p>So‘rovning haqiqiyligini tekshirish uchun <code>X-Signature</code> sarlavhasi yuboriladi. Bu tanadan API kalit bilan olingan HMAC-SHA256:</p>
+<pre><code>import hmac, hashlib
+
+def valid(body: bytes, signature: str, api_key: str) -> bool:
+    calc = hmac.new(api_key.encode(), body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(calc, signature)</code></pre>
+
+<h2 id="xatolar">Xatolar</h2>
+<p>Xato bo‘lsa <code>ok: false</code> qaytadi:</p>
+<pre><code>{ "ok": false, "error": "insufficient_balance", "message": "Balans yetarli emas" }</code></pre>
+<div class="tw"><table>
+<tr><th>HTTP</th><th>Kod</th><th>Sabab</th></tr>
+<tr><td class="s4">400</td><td><code>invalid_params</code></td><td>Maydonlar noto‘g‘ri yoki yetishmaydi</td></tr>
+<tr><td class="s4">401</td><td><code>invalid_api_key</code></td><td>API kalit noto‘g‘ri</td></tr>
+<tr><td class="s4">402</td><td><code>insufficient_balance</code></td><td>Balans yetarli emas</td></tr>
+<tr><td class="s4">404</td><td><code>user_not_found</code></td><td>Bunday username topilmadi</td></tr>
+<tr><td class="s4">404</td><td><code>order_not_found</code></td><td>Buyurtma topilmadi</td></tr>
+<tr><td class="s4">409</td><td><code>premium_already_active</code></td><td>Foydalanuvchida Premium faol</td></tr>
+<tr><td class="s4">429</td><td><code>rate_limited</code></td><td>So‘rovlar juda ko‘p</td></tr>
+<tr><td class="s4">500</td><td><code>server_error</code></td><td>Server xatosi, birozdan keyin urinib ko‘ring</td></tr>
+</table></div>
+
+<h2 id="limit">Limitlar</h2>
+<p>Har bir kalit uchun daqiqasiga 60 ta so‘rov. Oshib ketsa <code>429</code> va <code>Retry-After</code> sarlavhasi qaytadi. Bir xil <code>order_id</code> bilan qayta yuborilgan so‘rov yangi buyurtma yaratmaydi, avvalgisini qaytaradi.</p>
+<p>Savollar bo‘lsa: <b>@solostarsuz_bot</b></p>
+</main>
+</div>
+<script>
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+    ['c1','c2','c3'].forEach(function(id){document.getElementById(id).hidden=(id!==b.dataset.t)});
+  });
+});
+</script>
+</body>
+</html>
